@@ -97,3 +97,48 @@ void CoordinateMapping::polar
             r*sin(theta);
     }
 }
+
+void CoordinateMapping::TFI(
+    Mesh& mesh,
+    std::function<std::pair<double,double>(double)> CB,
+    std::function<std::pair<double,double>(double)> CT,
+    std::function<std::pair<double,double>(double)> CL,
+    std::function<std::pair<double,double>(double)> CR
+)
+{
+    auto blCorner = CL(0.0); //b - bottom, t - top, l - left, r -right
+    auto tlCorner = CT(0.0);
+    auto trCorner = CR(1.0);
+    auto brCorner = CB(1.0);
+
+    for(auto& node : mesh.nodes){
+        double xi = node.x;
+        double eta = node.y;
+
+        auto cb = CB(xi);
+        auto ct = CT(xi);
+        auto cl = CL(eta);
+        auto cr = CR(eta);
+
+        //could be written as a pair (X_correct)
+        double x_correct = (1-xi) *(1-eta)* blCorner.first
+                          +(1-xi) *  eta  * tlCorner.first
+                          + xi    *  eta  * trCorner.first
+                          +(1-eta)*   xi  * brCorner.first;
+
+        double y_correct = (1-xi) *(1-eta)* blCorner.second
+                          +(1-xi) *  eta  * tlCorner.second
+                          + xi    *  eta  * trCorner.second
+                          +(1-eta)*   xi  * brCorner.second;
+
+        node.x = (1-xi)  * cl.first
+                +  xi    * cr.first
+                +(1-eta) * cb.first
+                +  eta   * ct.first - x_correct;
+
+        node.y = (1-xi)  * cl.second
+                +  xi    * cr.second
+                +(1-eta) * cb.second
+                +  eta   * ct.second - y_correct;
+    }
+}

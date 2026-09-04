@@ -2,6 +2,7 @@
 #define COORDINATEMAPPING_H
 
 #include "Mesh.h"
+#include <functional>
 
 class CoordinateMapping
 {
@@ -44,6 +45,14 @@ public:
         double rOuter
     );
 
+    static void TFI
+    (
+        Mesh& mesh,
+        std::function<std::pair<double,double>(double)> CB,
+        std::function<std::pair<double,double>(double)> CT,
+        std::function<std::pair<double,double>(double)> CL,
+        std::function<std::pair<double,double>(double)> CR
+    );
 };
 
 #endif

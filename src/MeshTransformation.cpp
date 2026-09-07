@@ -62,7 +62,7 @@ void MeshTransformation::rotate
     double angleDeg
 )
 {
-    double theta = angleDeg * M_PI / 180.0;
+    double theta = angleDeg * acos(-1.0) / 180.0;
 
     double c = cos(theta);
     double s = sin(theta);

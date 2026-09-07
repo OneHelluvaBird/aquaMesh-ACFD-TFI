@@ -219,3 +219,27 @@ void Mesh::computeBoundingBox()
         ymax = std::max(ymax, node.y);
     }
 }
+
+double Mesh::shoelaceArea(std::vector<int> nodesIn){
+        nodesIn.push_back(nodesIn[0]);
+        int N=nodesIn.size();
+
+        double ans=0.0;
+
+        for(int n=0;n<N-1;n++){ 
+                ans=ans+nodes[nodesIn[n]].x*nodes[nodesIn[n+1]].y;
+                ans=ans-nodes[nodesIn[n]].y*nodes[nodesIn[n+1]].x;
+        }
+
+        ans=ans*0.5;
+        return ans;
+}
+
+void Mesh::computeCellAreas(){
+	cellArea.clear();
+	cellArea.reserve(cells.size());
+	for (auto& cell:cells)
+	{
+		cellArea.push_back(shoelaceArea(cell.nodeIDs));
+	}
+}

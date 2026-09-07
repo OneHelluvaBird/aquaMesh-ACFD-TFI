@@ -55,6 +55,12 @@ public:
 
     int getNumberOfCells() const;
 
+    // mesh quality(signed area/jacobianper cell)
+    std::vector<double>cellArea;
+    double shoelaceArea(std::vector<int> nodesIn);
+    void computeCellAreas();
+
+
 protected:
 
     void computeBoundingBox(const Surface& surface);

@@ -4,7 +4,7 @@ Compiling Instruction: g++ TFI.cpp src/*.cpp -Iinclude -std=c++17 -o TFI && ./TF
 #include<iostream>
 #include<cmath>
 #include<fstream>
-
+#include<algorithm>
 #include "Point.h"
 #include "Line.h"
 #include "Surface.h"
@@ -122,6 +122,68 @@ int main()
         "tfi.vtk"
     );
 
-    // Verification and Mesh Quality is left to do
+    // Mesh quality
+    tfi_mesh.computeCellAreas();
+    
+    double jmin=tfi_mesh.cellArea[0];
+    double jmax=tfi_mesh.cellArea[0];
+    int inval=-1;// no invalid found 
+
+    for (size_t c=0; c<tfi_mesh.cellArea.size();c++)
+    {
+	double j=tfi_mesh.cellArea[c];
+	if(j<jmin) jmin=j;
+	if(j>jmax) jmax=j;
+	if(j<=0.0 && inval==-1)
+	{
+		inval=static_cast<int>(c);
+	}
+     } 
+     std::cout<< "\nMesh Quality (TFI mesh)\n";
+     std::cout<< "------------------------\n";
+     std::cout<< "Jmin = " << jmin << std::endl;
+     std::cout<< "Jmax = " << jmax << std::endl;
+     
+     if (inval==-1)
+     {
+	std::cout<< "All cells have J > 0 : mesh is valid.\n";
+     }
+     else 
+     {
+	auto nodeIDs=tfi_mesh.cells[inval].nodeIDs;
+	double cx=0.0,cy=0.0;
+	for (int n:nodeIDs)
+	{
+		cx+=tfi_mesh.nodes[n].x;
+		cy+=tfi_mesh.nodes[n].y;
+	}
+	cx/=nodeIDs.size();
+	cy/=nodeIDs.size();
+	std::cout<<"INVALID cell found!\n";
+        std::cout<<"Cell ID:" <<inval<<"\n";
+        std::cout<<"Jacobian:"<<tfi_mesh.cellArea[inval]<<"\n";
+        std::cout<<"Location:("<<cx<<","<<cy<<")\n";
+    }
+
+    // modify bc
+    
+    auto CT_modi=[](double xi){
+    	std::pair<double,double>ans={xi,1.0+0.8*sin(acos(-1.0)*xi)};
+	return ans;
+    };
+    Mesh tfi_mesh_modi=xi_eta_mesh;
+    CoordinateMapping::TFI(tfi_mesh_modi,CB,CT_modi,CL,CR);
+    tfi_mesh_modi.computeCellAreas();
+    double jmin1=*std::min_element(tfi_mesh_modi.cellArea.begin(),tfi_mesh_modi.cellArea.end());
+    double jmax1=*std::max_element(tfi_mesh_modi.cellArea.begin(),tfi_mesh_modi.cellArea.end());
+    
+    std::cout<<"\nMesh Quality (modified CT amplitude 0.2 -> 0.8)\n";
+    std::cout<< "------------------------------------------------\n";
+    std::cout<<"Jmin="<<jmin1<<std::endl;
+    std::cout<<"Jmax="<<jmax1<<std::endl;
+    std::cout<<(jmin1>0.0 ? "All cells have J > 0 : mesh is valid.\n"
+                             : "Some cells have J <= 0 : mesh is INVALID.\n");
+    MeshWriter::writeVTK(tfi_mesh_modi,"tfi_modi.vtk");
+   
     return 0;
 }

@@ -122,6 +122,8 @@ int main()
             N_eta
         );
 
+        xi_eta_mesh.computeCellAreas();
+
         tfi_mesh = xi_eta_mesh;
 
         CoordinateMapping::TFI(
@@ -143,15 +145,15 @@ int main()
         );
 
         // Mesh quality
-        tfi_mesh.computeCellAreas();
+        tfi_mesh.computeJacobians();
         
-        double jmin=tfi_mesh.cellArea[0];
-        double jmax=tfi_mesh.cellArea[0];
+        double jmin=tfi_mesh.Jacobian[0];
+        double jmax=tfi_mesh.Jacobian[0];
         int inval=-1;// no invalid found 
 
-        for (size_t c=0; c<tfi_mesh.cellArea.size();c++)
+        for (size_t c=0; c<tfi_mesh.Jacobian.size();c++)
         {
-    	double j=tfi_mesh.cellArea[c];
+    	double j=tfi_mesh.Jacobian[c];
     	if(j<jmin) jmin=j;
     	if(j>jmax) jmax=j;
     	if(j<=0.0 && inval==-1)
@@ -181,7 +183,7 @@ int main()
     	cy/=nodeIDs.size();
     	std::cout<<"INVALID cell found!\n";
             std::cout<<"Cell ID:" <<inval<<"\n";
-            std::cout<<"Jacobian:"<<tfi_mesh.cellArea[inval]<<"\n";
+            std::cout<<"Jacobian:"<<tfi_mesh.Jacobian[inval]<<"\n";
             std::cout<<"Location:("<<cx<<","<<cy<<")\n";
         }
 
@@ -193,9 +195,9 @@ int main()
         };
         Mesh tfi_mesh_modi=xi_eta_mesh;
         CoordinateMapping::TFI(tfi_mesh_modi,CB,CT_modi,CL,CR);
-        tfi_mesh_modi.computeCellAreas();
-        double jmin1=*std::min_element(tfi_mesh_modi.cellArea.begin(),tfi_mesh_modi.cellArea.end());
-        double jmax1=*std::max_element(tfi_mesh_modi.cellArea.begin(),tfi_mesh_modi.cellArea.end());
+        tfi_mesh_modi.computeJacobians();
+        double jmin1=*std::min_element(tfi_mesh_modi.Jacobian.begin(),tfi_mesh_modi.Jacobian.end());
+        double jmax1=*std::max_element(tfi_mesh_modi.Jacobian.begin(),tfi_mesh_modi.Jacobian.end());
         
         std::cout<<"\nMesh Quality (modified CT amplitude 0.2 -> 0.8)\n";
         std::cout<< "------------------------------------------------\n";

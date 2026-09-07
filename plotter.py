@@ -37,9 +37,13 @@ for i in range(0,N_eta+1):
         xR.append(float(line[0]))
         yR.append(float(line[1]))
 
+plt.rcParams.update({'font.size': 16})
+
 plt.figure(0)
-plt.plot(xB,yB)
-plt.plot(xT,yT)
-plt.plot(xL,yL)
-plt.plot(xR,yR)
+plt.plot(xB,yB,linewidth=2)
+plt.plot(xT,yT,linewidth=2)
+plt.plot(xL,yL,linewidth=2)
+plt.plot(xR,yR,linewidth=2)
+plt.grid()
+plt.title("TFI: Boundaries")
 plt.show()

@@ -243,3 +243,17 @@ void Mesh::computeCellAreas(){
 		cellArea.push_back(shoelaceArea(cell.nodeIDs));
 	}
 }
+
+void Mesh::computeJacobians(){
+	Jacobian.clear();
+	Jacobian.reserve(cells.size());
+        int cellID=0;
+        double currArea;
+	for (auto& cell:cells)
+	{
+                currArea=shoelaceArea(cell.nodeIDs);
+		Jacobian.push_back(currArea/cellArea[cellID]);
+                cellArea[cellID]=currArea;
+                cellID=cellID+1;
+	}
+}

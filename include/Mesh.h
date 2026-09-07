@@ -57,8 +57,10 @@ public:
 
     // mesh quality(signed area/jacobianper cell)
     std::vector<double>cellArea;
+    std::vector<double>Jacobian;
     double shoelaceArea(std::vector<int> nodesIn);
     void computeCellAreas();
+    void computeJacobians();
 
 
 protected:
